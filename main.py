@@ -2,16 +2,18 @@ import random
 
 
 class Hero:
-    max_health = 500
+    max_health = 50
     health = max_health
     max_mana = 30
     mana = max_mana
     base_weapon_dmg = 0
     base_spell_dmg = 0
-    gold = 100
+    gold = 0
     exp = 0
-    lvl = 6
+    lvl = 1
     level_up = 25
+
+    dmg_done = 0
 
     armor = []
     weapon = []
@@ -110,6 +112,7 @@ class Hero:
         dmg_done = spell_dmg + self.base_spell_dmg
         enemy.health -= dmg_done
         print(f'Atakujesz wroga za pomocą {spell_name} za {dmg_done} punktów życia.\n')
+        return dmg_done
 
     def has_armor(self):
         return self.armor
@@ -180,11 +183,13 @@ class Monster:
     min_dmg = 0
     max_dmg = 0
     dmg = 0
+    immune = None
+    immune_value = 1000
 
     def attack(self, hero):
         dmg = random.randint(self.min_dmg, self.max_dmg)
         hero.health -= dmg
-        print(f'Zostałeś zaatakowany za {dmg} punktów życia\n')
+        print(f'Zostałeś zaatakowany za {dmg} punktów życia')
         return dmg
 
     def die(self):
@@ -192,6 +197,9 @@ class Monster:
 
     def get_exp_and_gold(self, hero):
         pass
+
+    def has_immune(self, spell_name):
+        return spell_name.dmg_type == self.immune
 
     def __str__(self):
         return self.monster_name
@@ -203,6 +211,7 @@ class Rat(Monster):
     min_dmg = 5
     max_dmg = 15
     dmg = 0
+    immune = 'ogień'
 
     def __init__(self, monster_name):
         super().__init__()
@@ -222,6 +231,7 @@ class Ogre(Monster):
     min_dmg = 20
     max_dmg = 30
     dmg = 0
+    immune = 'zimno'
 
     def __init__(self, monster_name):
         super().__init__()
@@ -241,6 +251,7 @@ class Troll(Monster):
     min_dmg = 40
     max_dmg = 80
     dmg = 0
+    immune = 'ogień'
 
     def __init__(self, monster_name):
         super().__init__()
@@ -589,7 +600,8 @@ if __name__ == '__main__':
         else:
             monster = Troll('troll')
 
-        print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster}a')
+        print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster}a, \n'
+              f'Odpornośc na: {monster.immune}')
 
         while monster.health > 0:
             print(f'\nMasz {hero.health} punktów życia i {hero.mana} punktów many.\n')
@@ -611,7 +623,10 @@ if __name__ == '__main__':
                 print('-' * 20 + '\n')
                 if hero.has_spell(choose_spell):
                     get_spell = hero.spells.get(choose_spell)
-                    hero.spell_attack(monster, get_spell)
+                    if not monster.has_immune(get_spell):
+                        hero.spell_attack(monster, get_spell)
+                    else:
+                        print(f'{monster.monster_name} posiada niewrażliwość na {monster.immune}\n')
             if monster.health > 0:
                 print('Potwór kontratakuje')
                 if hero.has_armor():
