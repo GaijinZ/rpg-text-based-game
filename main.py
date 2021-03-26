@@ -2,22 +2,24 @@ import random
 
 
 class Hero:
-    max_health = 50
+    max_health = 500
     health = max_health
     max_mana = 30
     mana = max_mana
-    base_weapon_dmg = 0
+    defence = 0
+    base_weapon_dmg = 100
     base_spell_dmg = 0
-    gold = 0
+    gold = 100
     exp = 0
-    lvl = 1
-    level_up = 25
+    lvl = 10
+    level_up = 250
 
     dmg_done = 0
 
     armor = []
     weapon = []
     spells = {}
+    potions = {}
     attributes = {'strength': 0, 'intelligence': 0, 'stamina': 0}
 
     def __init__(self, name):
@@ -29,19 +31,20 @@ class Hero:
     def get_basic_weapon(self):
         return self.weapon.append(base_weapon)
 
-    def sword_attack(self, enemy):
+    def sword_attack(self):
         if self.mana >= self.max_mana:
             self.mana = self.max_mana
         self.mana += 5
         weapon_attack = self.weapon[0]
         weapon_dmg = random.randint(weapon_attack.min_dmg, weapon_attack.max_dmg)
-        dmg_done = weapon_dmg + self.base_weapon_dmg
-        enemy.health -= dmg_done
-        print(f'Atakujesz wroga za pomocą miecza za {dmg_done} punktów życia.\n')
+        self.dmg_done = weapon_dmg + self.base_weapon_dmg
+        return self.dmg_done
 
     def has_spell_potion(self, item_group, item_name):
         if item_group == spells_available:
             item_group = self.spells
+        elif item_group == potions_available:
+            item_group = self.potions
         for key, value in item_group.items():
             if item_name == key:
                 return value
@@ -79,6 +82,8 @@ class Hero:
         for i in item_group.values():
             if item_group == spells_available:
                 item_group = self.spells
+            elif item_group == potions_available:
+                item_group = self.potions
             if item_name in i.name:
                 if i.gold_required > self.gold:
                     print('\nNie masz hajsu.')
@@ -91,12 +96,7 @@ class Hero:
                 print(f'{i} został dodany do Twojego ekwipunku.\n')
                 return True
 
-    def has_spell(self, choose_spell):
-        for key, value in self.spells.items():
-            if choose_spell == key:
-                return value
-
-    def spell_attack(self, enemy, spell_name):
+    def spell_attack(self, spell_name):
         if spell_name.mana > self.mana:
             print('\nNie mie masz wystarczającej ilości many.\n')
             return False
@@ -109,21 +109,26 @@ class Hero:
         min_dmg = spell_name.min_dmg
         max_dmg = spell_name.max_dmg
         spell_dmg = random.randint(min_dmg, max_dmg)
-        dmg_done = spell_dmg + self.base_spell_dmg
-        enemy.health -= dmg_done
-        print(f'Atakujesz wroga za pomocą {spell_name} za {dmg_done} punktów życia.\n')
-        return dmg_done
+        self.dmg_done += spell_dmg + self.base_spell_dmg
+        return self.dmg_done
+
+    def hit(self, monster):
+        monster.health -= self.dmg_done
 
     def has_armor(self):
         return self.armor
 
-    def armor_defence(self, monster):
-        for arm in self.armor:
-            arm.health += self.max_health
-            arm.less_dmg -= monster.dmg
+    def armor_bonus(self):
+        self.max_health += self.armor[0].health
+        self.defence += self.armor[0].defence
 
-    def die(self):
-        print('Stracileś wszystkie punkty życia. Nie żyjesz.\n')
+    def use_potion(self, potion):
+        if potion == healing_potion:
+            self.health = self.max_health
+            print('Uzpupełnisaz życie.\n')
+        if potion == mana_potion:
+            self.mana = self.max_mana
+            print('Uzpupełnisaz manę.\n')
 
     def lvl_up(self):
         if self.exp >= self.level_up:
@@ -170,27 +175,47 @@ class Hero:
             return False
         for spell, value in self.spells.items():
             print(f'{spell} obrażenia od {value.min_dmg} do {value.max_dmg},'
-                  f' koszt many {value.mana} punktów many, typ obrażeń {value.dmg_type}.')
+                  f' koszt many {value.mana} punktów many, typ obrażeń {value.dmg_type}.\n')
+
+    def show_potions(self):
+        if not self.potions:
+            print('Nie posiadasz żadnych miksturek.')
+            return False
+        for value in self.potions.values():
+            print(f'{value.name} - {value.action}')
+
+    def die(self):
+        print('Stracileś wszystkie punkty życia. Nie żyjesz.\n')
 
     def __str__(self):
         return self.name
 
 
 class Monster:
+    boss = False
     monster_name = None
     max_health = 0
     health = 0
     min_dmg = 0
     max_dmg = 0
-    dmg = 0
+    dmg_done = 0
     immune = None
-    immune_value = 1000
 
-    def attack(self, hero):
-        dmg = random.randint(self.min_dmg, self.max_dmg)
-        hero.health -= dmg
-        print(f'Zostałeś zaatakowany za {dmg} punktów życia')
-        return dmg
+    if boss:
+        max_health *= 2
+        min_dmg *= 2
+        max_dmg *= 2
+        print(f'Trafiasz na zmutowany gatunek {monster_name},który posiada zwiekszone życie i obrażenia.\n'
+              'Bądź ostrożny.\n')
+
+    def attack(self):
+        self.dmg_done = random.randint(self.min_dmg, self.max_dmg)
+        return self.dmg_done
+
+    def hit(self, hero):
+        self.dmg_done -= hero.defence
+        hero.health -= self.dmg_done
+        print(f'Potwór kontratakuje za {self.dmg_done} obrażeń')
 
     def die(self):
         print('Zabiłeś potwora.\n')
@@ -198,8 +223,10 @@ class Monster:
     def get_exp_and_gold(self, hero):
         pass
 
-    def has_immune(self, spell_name):
-        return spell_name.dmg_type == self.immune
+    def has_immune(self, spell_name, hero):
+        if spell_name.dmg_type == self.immune:
+            hero.mana -= spell_name.mana
+            return True
 
     def __str__(self):
         return self.monster_name
@@ -210,7 +237,6 @@ class Rat(Monster):
     health = max_health
     min_dmg = 5
     max_dmg = 15
-    dmg = 0
     immune = 'ogień'
 
     def __init__(self, monster_name):
@@ -226,11 +252,11 @@ class Rat(Monster):
 
 
 class Ogre(Monster):
-    max_health = random.randint(20, 50)
+    max_health = random.randint(30, 60)
     health = max_health
     min_dmg = 20
     max_dmg = 30
-    dmg = 0
+    dmg_done = 0
     immune = 'zimno'
 
     def __init__(self, monster_name):
@@ -250,7 +276,6 @@ class Troll(Monster):
     health = max_health
     min_dmg = 40
     max_dmg = 80
-    dmg = 0
     immune = 'ogień'
 
     def __init__(self, monster_name):
@@ -306,7 +331,7 @@ class Fireball(Spell):
 
 class IceBolt(Spell):
     name = 'ice bolt'
-    dmg_type = 'lód'
+    dmg_type = 'zimno'
     min_dmg = 6
     max_dmg = 15
     mana = 7
@@ -323,7 +348,7 @@ class IceBolt(Spell):
 
 class Blizzard(Spell):
     name = 'blizzard'
-    dmg_type = 'lód'
+    dmg_type = 'zimno'
     min_dmg = 15
     max_dmg = 22
     mana = 10
@@ -442,13 +467,13 @@ class BladeOfChaos(Weapon):
 class Armor:
     name = None
     health = 0
-    less_dmg = 0
+    defence = 0
     gold_required = 0
     lvl_required = 0
 
     def description(self):
         return f'{self.name} - zbroja dodaje do życia {self.health}, ' \
-               f'zmniejszoneo obrażenia o {self.less_dmg}.'
+               f'zmniejszoneo obrażenia o {self.defence}.'
 
     def __repr__(self):
         return self.name
@@ -457,7 +482,7 @@ class Armor:
 class MagePlate(Armor):
     name = 'mage plate'
     health = 10
-    less_dmg = 5
+    defence = 5
     gold_required = 15
     lvl_required = 5
 
@@ -465,7 +490,7 @@ class MagePlate(Armor):
 class ArchonPlate(Armor):
     name = 'archon plate'
     health = 15
-    less_dmg = 10
+    defence = 10
     gold_required = 35
     lvl_required = 10
 
@@ -473,33 +498,38 @@ class ArchonPlate(Armor):
 class HeavyPlate(Armor):
     name = 'heavy plate'
     health = 30
-    less_dmg = 15
+    defence = 15
     gold_required = 55
     lvl_required = 20
 
 
 class Potion:
-    pass
+    name = None
+    gold_required = 0
+    lvl_required = 0
+    action = ''
 
+    def description(self):
+        return f'{self.name} - {self.action}, ' \
+               f'koszt kupna {self.gold_required} sztuk złota, ' \
+               f'wymagany poziom bohatera: {self.lvl_required}'
 
-class ReduceManaPotion(Potion):
-    pass
-
-
-class DoubleDmgPotion(Potion):
-    pass
+    def __repr__(self):
+        return self.name
 
 
 class HealingPotion(Potion):
-    pass
+    name = 'zycia'
+    gold_required = 5
+    lvl_required = 1
+    action = 'odnawia życie do pełna'
 
 
 class ManaPotion(Potion):
-    pass
-
-
-class MaxDmgAndIgnoreImmunePotion(Potion):
-    pass
+    name = 'many'
+    gold_required = 5
+    lvl_required = 1
+    action = 'odnawia manę do pełna'
 
 
 if __name__ == '__main__':
@@ -527,6 +557,9 @@ if __name__ == '__main__':
     archon_plate = ArchonPlate()
     heavy_plate = HeavyPlate()
 
+    healing_potion = HealingPotion()
+    mana_potion = ManaPotion()
+
     weapons_available = [giant_sword, leviathan_axe, war_scythe, blade_of_chaos]
 
     spells_available = {'fireball': fireball,
@@ -537,6 +570,9 @@ if __name__ == '__main__':
                         'meteor': meteor}
 
     armors_available = [mage_plate, archon_plate, heavy_plate]
+
+    potions_available = {'healing_potion': healing_potion,
+                         'mana_potion': mana_potion}
 
     print('Przemierzasz świat aby ratować wioski i zabijać potwory, które je nękają...\n')
 
@@ -555,6 +591,7 @@ if __name__ == '__main__':
                                       '1 - bronie\n'
                                       '2 - czary\n'
                                       '3 - zbroje\n'
+                                      '4 - mikstury\n'
                                       '0 - wyjście\n'))
             print('-' * 20 + '\n')
 
@@ -572,6 +609,10 @@ if __name__ == '__main__':
                 display_items = armors_available
                 for compare in compare_armors:
                     print(compare.description())
+            elif display_items == 4:
+                display_items = potions_available
+                for display in potions_available.values():
+                    print(display.description())
             else:
                 print('Nie ma takiego numeru.')
 
@@ -581,7 +622,7 @@ if __name__ == '__main__':
                 print('-' * 20 + '\n')
                 if item_name == '':
                     break
-                if display_items == spells_available:
+                if display_items == spells_available or display_items == potions_available:
                     if not hero.has_spell_potion(display_items, item_name):
                         if hero.buy_spell_potion(display_items, item_name):
                             break
@@ -600,6 +641,12 @@ if __name__ == '__main__':
         else:
             monster = Troll('troll')
 
+        if hero.has_armor():
+            hero.armor_bonus()
+
+        hero.health = hero.max_health
+        hero.mana = hero.max_mana
+
         print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster}a, \n'
               f'Odpornośc na: {monster.immune}')
 
@@ -609,37 +656,42 @@ if __name__ == '__main__':
 
             while True:
                 attack = int(input('Wybierz 1 jezeli chcesz zaatakować mieczem.\n'
-                                   'Wybierz 2 jeżeli chesz zaatakować czarem\n'))
-                if attack < 3:
+                                   'Wybierz 2 jeżeli chesz zaatakować czarem\n'
+                                   'Wybierz 3 jeżeli chesz użyć mikstury.\n'))
+                if attack < 4:
                     break
 
             print('-' * 20 + '\n')
             if attack == 1:
-                hero.sword_attack(monster)
+                hero.sword_attack()
+                hero.hit(monster)
+                print(f'Atakujesz wroga za pomocą miecza za {hero.dmg_done} punktów życia.\n')
             elif attack == 2:
                 print('\nTwoje czary to:\n')
                 hero.show_skills()
                 choose_spell = input('\nWpisz nazwę czaru, którym chcesz zaatakować: ')
                 print('-' * 20 + '\n')
-                if hero.has_spell(choose_spell):
+                if hero.has_spell_potion(spells_available, choose_spell):
                     get_spell = hero.spells.get(choose_spell)
-                    if not monster.has_immune(get_spell):
-                        hero.spell_attack(monster, get_spell)
+                    if not monster.has_immune(get_spell, hero):
+                        hero.spell_attack(get_spell)
+                        hero.hit(monster)
+                        print(f'Atakujesz wroga za pomocą {choose_spell} za {hero.dmg_done} punktów życia.\n')
                     else:
                         print(f'{monster.monster_name} posiada niewrażliwość na {monster.immune}\n')
+            elif attack == 3:
+                hero.show_potions()
+                choose_potion = input('Wybierz miksturę, którą chcesz użyć: ')
+                print('-' * 20 + '\n')
+                if hero.has_spell_potion(potions_available, choose_potion):
+                    get_potion = hero.potions.get(choose_potion)
+                    hero.use_potion(get_potion)
             if monster.health > 0:
-                print('Potwór kontratakuje')
-                if hero.has_armor():
-                    hero.armor_defence(monster)
-                    monster.attack(hero)
-                monster.attack(hero)
+                monster.attack()
+                monster.hit(hero)
             else:
                 monster.die()
                 monster.get_exp_and_gold(hero)
-                hero.health = hero.max_health
-                hero.mana = hero.max_mana
-                print('Pijąc krew potwora uzupelniasz życia i manę.\n')
-                print(f'Życie: {hero.health}, mana: {hero.mana}')
                 if hero.lvl_up():
                     print(f'Awansujesz na poziom {hero.lvl}\n')
                     print(f'Twoje życie i mana zwiekszją się. Teraz wynoszą: {hero.max_health} i {hero.max_mana}\n')
