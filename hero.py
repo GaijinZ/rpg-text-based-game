@@ -1,23 +1,26 @@
-from items import *
+import random
+
+from items import RustedSword
+from shop import items_to_buy
 
 
 class Hero:
-    max_health = 500
+    max_health = 50
     health = max_health
     max_mana = 30
     mana = max_mana
     defence = 0
-    base_weapon_dmg = 100
+    base_weapon_dmg = 0
     base_spell_dmg = 0
-    gold = 100
+    gold = 0
     exp = 0
-    lvl = 4
+    lvl = 1
     level_up = 250
 
     dmg_done = 0
 
-    armor = []
-    weapon = []
+    armor = None
+    weapon = None
     spells = {}
     potions = {}
     attributes = {'strength': 0, 'intelligence': 0, 'stamina': 0}
@@ -29,73 +32,49 @@ class Hero:
         print(f'Jestem {self.name}, przybyłem by zabijać potwory i palić wiedźmy.\n')
 
     def get_basic_weapon(self):
-        base_weapon = BaseWeapon()
-        return self.weapon.append(base_weapon)
+        weapon = RustedSword()
+        return weapon
 
     def sword_attack(self):
         if self.mana >= self.max_mana:
             self.mana = self.max_mana
         self.mana += 5
-        weapon_attack = self.weapon[0]
-        weapon_dmg = random.randint(weapon_attack.min_dmg, weapon_attack.max_dmg)
+        weapon_dmg = random.randint(self.weapon.min_dmg, self.weapon.max_dmg)
         self.dmg_done = weapon_dmg + self.base_weapon_dmg
         return self.dmg_done
 
-    def has_spell_potion(self, item_group, item_name):
-        if item_group == spells_available:
+    def has_gold_lvl_required(self, buy_item):
+        if buy_item.gold_required > self.gold:
+            print('Nie masz hajsu.\n')
+            return False
+        if buy_item.lvl_required > self.lvl:
+            print('Posiadasz za mały poziom doświadczenia. Idz bić potwory.\n')
+            return False
+        self.gold -= buy_item.gold_required
+        return True
+
+    def buy_from_shop(self, buy_item):
+        if buy_item in items_to_buy.get('weapons'):
+            self.weapon = buy_item
+            return self.weapon
+        if buy_item in items_to_buy.get('armors'):
+            self.armor = buy_item
+            return self.armor
+        if buy_item in items_to_buy.get('spells'):
+            self.spells[buy_item.name] = buy_item
+            return self.spells
+        if buy_item in items_to_buy.get('potions'):
+            self.potions[buy_item.name] = buy_item
+            return self.potions
+
+    def has_spell_potion(self, item_group, choose_name):
+        if item_group == self.spells:
             item_group = self.spells
-        elif item_group == potions_available:
+        elif item_group == self.potions:
             item_group = self.potions
         for key, value in item_group.items():
-            if item_name == key:
+            if choose_name == key:
                 return value
-
-    def has_weapon_armor(self, item_group, item_name):
-        if item_group == weapons_available:
-            item_group = self.weapon
-        elif item_group == armors_available:
-            item_group = self.armor
-        for item in item_group:
-            if item_name == item.name:
-                return True
-            item_group.pop(0)
-            return False
-
-    def buy_weapon_armor(self, item_group, item_name):
-        for item in item_group:
-            if item_group == weapons_available:
-                item_group = self.weapon
-            elif item_group == armors_available:
-                item_group = self.armor
-            if item_name in item.name:
-                if item.gold_required > self.gold:
-                    print('\nNie masz hajsu.')
-                    return False
-                if item.lvl_required > self.lvl:
-                    print('\nPosiadasz za mały poziom doświadczenia. Idz bić potwory.\n')
-                    return False
-                self.gold -= item.gold_required
-                item_group.append(item)
-                print(f'{item} został dodany do Twojego ekwipunku.\n')
-                return True
-
-    def buy_spell_potion(self, item_group, item_name):
-        for i in item_group.values():
-            if item_group == spells_available:
-                item_group = self.spells
-            elif item_group == potions_available:
-                item_group = self.potions
-            if item_name in i.name:
-                if i.gold_required > self.gold:
-                    print('\nNie masz hajsu.')
-                    return False
-                if i.lvl_required > self.lvl:
-                    print('\nPosiadasz za mały poziom doświadczenia. Idz bić potwory.\n')
-                    return False
-                self.gold -= i.gold_required
-                item_group[item_name] = i
-                print(f'{i} został dodany do Twojego ekwipunku.\n')
-                return True
 
     def spell_attack(self, spell_name):
         if spell_name.mana > self.mana:
@@ -116,10 +95,7 @@ class Hero:
     def hit(self, monster):
         monster.health -= self.dmg_done
 
-    def has_armor(self):
-        return self.armor
-
-    def armor_bonus(self):
+    def add_armor_bonus(self):
         self.max_health += self.armor[0].health
         self.defence += self.armor[0].defence
 
@@ -127,6 +103,7 @@ class Hero:
         if potion == healing_potion:
             self.health = self.max_health
             print('Uzpupełnisaz życie.\n')
+            print(self.potions)
         if potion == mana_potion:
             self.mana = self.max_mana
             print('Uzpupełnisaz manę.\n')
@@ -135,11 +112,11 @@ class Hero:
         # print('Redukujesz manę o połowę przy następnym użyciu czaru.\n')
         if potion == double_dmg_potion:
             self.dmg_done *= 2
-            print(f'Zadajesz podwójne obrażenia przy następnym ataku.\n')
         if potion == ignore_immune:
             monster.immune = None
             self.dmg_done = self.weapon[0].max_dmg
-        return potion
+        del self.potions[potion.name]
+        print(self.potions)
 
     def lvl_up(self):
         if self.exp >= self.level_up:

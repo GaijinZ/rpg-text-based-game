@@ -42,7 +42,6 @@ class Rat(Monster):
     immune = 'ogień'
 
     def __init__(self, monster_name):
-        super().__init__()
         self.monster_name = monster_name
 
     def get_exp_and_gold(self, hero):
@@ -62,7 +61,6 @@ class Ogre(Monster):
     immune = 'zimno'
 
     def __init__(self, monster_name):
-        super().__init__()
         self.monster_name = monster_name
 
     def get_exp_and_gold(self, hero):
@@ -81,7 +79,6 @@ class Troll(Monster):
     immune = 'ogień'
 
     def __init__(self, monster_name):
-        super().__init__()
         self.monster_name = monster_name
 
     def get_exp_and_gold(self, hero):

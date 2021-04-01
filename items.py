@@ -1,130 +1,3 @@
-import random
-
-
-class Spell:
-    name = None
-    dmg_type = None
-    min_dmg = 0
-    max_dmg = 0
-    mana = 0
-    gold_required = 0
-    lvl_required = 0
-
-    def description(self):
-        return f'{self.name} - obrażenia od {self.min_dmg} do {self.max_dmg}, ' \
-               f'koszt many {self.mana} punktów many, typ obrażeń {self.dmg_type}, ' \
-               f'koszt kupna {self.gold_required} sztuk złota, ' \
-               f'wymagany poziom bohatera: {self.lvl_required}.'
-
-    def additional_effect(self):
-        pass
-
-    def __repr__(self):
-        return self.name
-
-
-class Fireball(Spell):
-    name = 'fireball'
-    dmg_type = 'ogień'
-    min_dmg = 5
-    max_dmg = 10
-    mana = 5
-    gold_required = 5
-    lvl_required = 1
-
-    def additional_effect(self):
-        effect = random.randrange(6)
-        if effect == 1:
-            self.max_dmg += 10
-            print(f'\nSkuteczny atak {self.name}, przeciwnik staje w plomieniach. '
-                  'Maksymalne obrażenia zwiekszone o 10.')
-            return self.max_dmg
-        return False
-
-
-class IceBolt(Spell):
-    name = 'ice bolt'
-    dmg_type = 'zimno'
-    min_dmg = 6
-    max_dmg = 15
-    mana = 7
-    gold_required = 10
-    lvl_required = 3
-
-    def additional_effect(self):
-        effect = random.randrange(2)
-        if effect == 1:
-            print('\nSkuteczny atak, przeciwnik zamarza na jedna turę.')
-        return False
-
-
-class Blizzard(Spell):
-    name = 'blizzard'
-    dmg_type = 'zimno'
-    min_dmg = 15
-    max_dmg = 22
-    mana = 10
-    gold_required = 15
-    lvl_required = 5
-
-    def additional_effect(self):
-        effect = random.randrange(11)
-        if effect == 1:
-            self.max_dmg += 25
-            print(f'\nSkuteczny atak {self.name}, przeciwnik zamarza. '
-                  'Maksymalne obrażenia zwiekszone o 25.')
-            return self.max_dmg
-        return False
-
-
-class Earthquake(Spell):
-    name = 'earthquake'
-    dmg_type = 'ziemia'
-    min_dmg = 25
-    max_dmg = 30
-    mana = 15
-    gold_required = 20
-    lvl_required = 8
-
-    def additional_effect(self):
-        effect = random.randrange(6)
-        if effect == 1:
-            self.min_dmg = self.max_dmg
-            print(f'\nSkuteczny atak {self.name}. Zadajesz maksymalne obrażenia.')
-            return self.min_dmg
-        return False
-
-
-class Meteor(Spell):
-    name = 'meteor'
-    dmg_type = 'ogień'
-    min_dmg = 30
-    max_dmg = 40
-    mana = 30
-    gold_required = 40
-    lvl_required = 10
-
-    def additional_effect(self):
-        effect = random.randrange(11)
-        if effect == 1:
-            self.max_dmg += 25
-            print(f'\nSkuteczny atak {self.name}, przeciwnik staje w płomieniach. '
-                  f'Maksymalne obrażenia zwiekszone o 25.')
-        return False
-
-
-class HealingSpell(Spell):
-    name = 'holy light'
-    mana = 20
-    gold_required = 30
-    lvl_required = 5
-
-    def description(self):
-        return f'{self.name} - zupełnia całe życie, koszt many {self.mana}, ' \
-               f'koszt kupna {self.gold_required} sztuk złota, ' \
-               f'wymagany poziom bohatera: {self.lvl_required}.'
-
-
 class Weapon:
     name = None
     min_dmg = 0
@@ -141,8 +14,8 @@ class Weapon:
         return self.name
 
 
-class BaseWeapon(Weapon):
-    name = 'rusty sword'
+class RustedSword(Weapon):
+    name = 'rusted sword'
     min_dmg = 4
     max_dmg = 6
     gold_required = 0
@@ -236,46 +109,39 @@ class Potion:
 
 
 class HealingPotion(Potion):
-    name = 'zycia'
+    name = 'healing potion'
     gold_required = 5
     lvl_required = 1
     action = 'odnawia życie do pełna'
 
 
 class ManaPotion(Potion):
-    name = 'many'
+    name = 'mana potion'
     gold_required = 5
     lvl_required = 1
     action = 'odnawia manę do pełna'
 
 
 class ReduceManaPotion(Potion):
-    name = 'zmniejszona mana'
+    name = 'reduced mana potion'
     gold_required = 8
     lvl_required = 3
     action = ' zmniejsza koszt rzucenia czaru o połowę'
 
 
 class DoubleDmgPotion(Potion):
-    name = 'podwojne obrazenia'
+    name = 'double dmg potion'
     gold_required = 12
     lvl_required = 5
     action = 'następny atak zada podwójne obrażenia'
 
 
 class MaxDmgAndIgnoreImmunePotion(Potion):
-    name = 'redukcja odpornosci'
+    name = 'ignore immune'
     gold_required = 10
     lvl_required = 5
     action = 'usuwa odporność wroga, następny atak zada maksymalne obrażenia'
 
-
-fireball = Fireball()
-ice_bolt = IceBolt()
-blizzard = Blizzard()
-holy_light = HealingSpell()
-earthquake = Earthquake()
-meteor = Meteor()
 
 giant_sword = GiantSword()
 leviathan_axe = LeviathanAxe()
@@ -293,13 +159,6 @@ double_dmg_potion = DoubleDmgPotion()
 ignore_immune = MaxDmgAndIgnoreImmunePotion()
 
 weapons_available = [giant_sword, leviathan_axe, war_scythe, blade_of_chaos]
-
-spells_available = {'fireball': fireball,
-                    'ice bolt': ice_bolt,
-                    'blizzard': blizzard,
-                    'holy light': holy_light,
-                    'earthquake': earthquake,
-                    'meteor': meteor}
 
 armors_available = [mage_plate, archon_plate, heavy_plate]
 
