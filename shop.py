@@ -1,6 +1,7 @@
 from spells import Fireball, IceBolt, Blizzard, Earthquake, Meteor, HealingSpell
 from items import GiantSword, LeviathanAxe, WarScythe, BladeOfChaos, MagePlate, ArchonPlate, \
     HeavyPlate, HealingPotion, ManaPotion, ReduceManaPotion, DoubleDmgPotion, MaxDmgAndIgnoreImmunePotion
+from enemy import Rat, Ogre, Troll
 
 giant_sword = GiantSword()
 leviathan_axe = LeviathanAxe()
@@ -24,6 +25,10 @@ holy_light = HealingSpell()
 earthquake = Earthquake()
 meteor = Meteor()
 
+rat = Rat('Szczur')
+ogre = Ogre('Ogr')
+troll = Troll('Troll')
+
 items_to_buy = {
     'weapons': {'giant sword': giant_sword,
                 'leviathan axe': leviathan_axe,
@@ -43,4 +48,10 @@ items_to_buy = {
                 'reduced mana potion': reduced_mana_potion,
                 'double dmg potion': double_dmg_potion,
                 'ignore immune': ignore_immune},
+}
+
+monsters = {
+    'rat': rat,
+    'ogre': ogre,
+    'troll': troll,
 }

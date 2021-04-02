@@ -3,26 +3,34 @@ import random
 
 class Monster:
     name = None
+    min_health = 0
     max_health = 0
-    health = max_health
+    health = random.randint(min_health, max_health)
+    current_health = health
     min_dmg = 0
     max_dmg = 0
     dmg_done = 0
     immune = None
     type = None
+    occurs = None
+
+    def bestiary(self):
+        return f'{self.name} - maksymalne życie {self.max_health}, obrażenia od {self.min_dmg} '\
+               f'do {self.max_dmg}, odporność na {self.immune}, pojawia się: {self.occurs}.\n'
 
     def monster_type(self, hero):
         if hero.lvl <= 5:
-            self.type = Rat('szczur')
+            self.type = Rat('Szczur')
         elif 6 <= hero.lvl <= 15:
-            self.type = Ogre('ogr')
+            self.type = Ogre('Ogr')
         else:
-            self.type = Troll('troll')
+            self.type = Troll('Troll')
         return self.type
 
     def boss(self):
+        self.type.min_health *= 2
         self.type.max_health *= 2
-        self.type.health = self.type.max_health
+        self.type.current_health = self.type.health
         self.type.min_dmg *= 2
         self.type.max_dmg *= 2
         print(f'Trafiasz na zmutowany gatunek {self.type.name}a,który posiada zwiekszone życie i obrażenia.\n'
@@ -54,11 +62,15 @@ class Monster:
 
 
 class Rat(Monster):
-    max_health = random.randint(15, 25)
+    min_health = 15
+    max_health = 25
+    health = random.randint(min_health, max_health)
+    current_health = health
     health = max_health
     min_dmg = 5
     max_dmg = 15
     immune = 'zimno'
+    occurs = 'lasy'
 
     def __init__(self, name):
         self.name = name
@@ -72,12 +84,15 @@ class Rat(Monster):
 
 
 class Ogre(Monster):
-    max_health = random.randint(30, 60)
-    health = max_health
+    min_health = 30
+    max_health = 60
+    health = random.randint(min_health, max_health)
+    current_health = health
     min_dmg = 20
     max_dmg = 30
     dmg_done = 0
     immune = 'ogień'
+    occurs = 'bagna'
 
     def __init__(self, name):
         self.name = name
@@ -91,11 +106,14 @@ class Ogre(Monster):
 
 
 class Troll(Monster):
-    max_health = random.randint(50, 100)
-    health = max_health
+    min_health = 50
+    max_health = 100
+    health = random.randint(min_health, max_health)
+    current_health = health
     min_dmg = 40
     max_dmg = 80
     immune = 'ogień'
+    occurs = 'jaskinie'
 
     def __init__(self, name):
         self.name = name

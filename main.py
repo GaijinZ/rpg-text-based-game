@@ -1,6 +1,6 @@
 from hero import Hero
 from enemy import Monster
-from shop import items_to_buy
+from shop import items_to_buy, monsters
 
 
 def run_game():
@@ -10,32 +10,40 @@ def run_game():
         def shop():
 
             while True:
-                print('Witaj w sklepie!\n'
-                      'Tutaj możesz uzbroić się w zbroję, tarczę, broń lub kupić czary.\n'
-                      'Aby kupić przedmiot najpierw wpisz jego kategorię np. armors, później jego nazwę.'
-                      'Aby wyjść naciśnij ENTER.')
+                start_shop = input('Witaj w sklepie!\n'
+                                   'Tutaj możesz uzbroić się w zbroję, tarczę, broń lub kupić czary.\n'
+                                   'Aby kupić przedmiot najpierw wpisz jego kategorię np. armors, później jego nazwę.\n'
+                                   'Wybierz 1 aby wyświetlić przedmioty do kupienia.\n'
+                                   'Wybierz 0 aby wyświetlić bestiariusz.\n'
+                                   'Aby wyjść naciśnij ENTER.\n')
+                print('-' * 20 + '\n')
 
-                for key, value in items_to_buy.items():
-                    print(f'\n{key}\n')
-                    for items in value.values():
-                        print(items.description())
+                if start_shop == '0':
+                    for monster_info in monsters.values():
+                        print(monster_info.bestiary())
 
-                while True:
-                    item_category = input('\nWpisz kategorię przedmiotu: ').lower()
-                    item_name = input('\nWpisz nazwę przedmiotu, który chcesz kupić: ').lower()
-                    print('-' * 20 + '\n')
+                if start_shop == '1':
+                    for key, value in items_to_buy.items():
+                        print(f'\n{key}\n')
+                        for items in value.values():
+                            print(items.description())
 
-                    if item_name == '':
-                        return False
-                    buy_item = items_to_buy.get(item_category).get(item_name)
-                    if item_name != str(buy_item):
-                        print('Nie ma takiego przedmiotu.\n')
-                        break
-                    if hero.has_gold_lvl_required(buy_item):
-                        hero.buy_from_shop(buy_item)
-                        del items_to_buy[item_category][item_name]
-                        print(f'{item_name} został dodany do Twoich przedmiotów.\n')
-                        break
+                    while True:
+                        item_category = input('\nWpisz kategorię przedmiotu: ').lower()
+                        item_name = input('\nWpisz nazwę przedmiotu, który chcesz kupić: ').lower()
+                        print('-' * 20 + '\n')
+
+                        if item_name == '':
+                            return False
+                        buy_item = items_to_buy.get(item_category).get(item_name)
+                        if item_name != str(buy_item):
+                            print('Nie ma takiego przedmiotu.\n')
+                            break
+                        if hero.has_gold_lvl_required(buy_item):
+                            hero.buy_from_shop(buy_item)
+                            del items_to_buy[item_category][item_name]
+                            print(f'{item_name} został dodany do Twoich przedmiotów.\n')
+                            break
 
         print(f'Posiadasz {hero.gold} sztuk złota.\n')
         go_to_shop = input('Wpisz "sklep" aby przejsc do sklepu '
@@ -59,14 +67,14 @@ def run_game():
         hero.health = hero.max_health
         hero.mana = hero.max_mana
 
-        while monster.type.health > 0:
+        while monster.type.current_health > 0:
 
             print(f'Masz {hero.health} punktów życia i {hero.mana} punktów many.\n')
-            print(f'Potwór posiada {monster.type.health} punktów życia.\n')
+            print(f'Potwór posiada {monster.type.current_health} punktów życia.\n')
 
             while True:
                 attack = int(input('Wybierz 1 jeżeli chcesz zaatakować mieczem.\n'
-                                   'Wybierz 2 jeżeli chesz zaatakować czarem\n'
+                                   'Wybierz 2 jeżeli chesz zaatakować czarem.\n'
                                    'Wybierz 3 jeżeli chcesz użyć mikstury.\n'))
                 if attack < 4:
                     break

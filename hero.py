@@ -95,7 +95,7 @@ class Hero:
         return self.dmg_done
 
     def hit(self, monster):
-        monster.health -= self.dmg_done
+        monster.current_health -= self.dmg_done
 
     def add_armor_bonus(self):
         self.max_health += self.armor.health
