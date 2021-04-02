@@ -1,10 +1,9 @@
 from hero import Hero
-from enemy import Rat, Ogre, Troll
+from enemy import Monster
 from shop import items_to_buy
 
 
 def run_game():
-
     global monsters_killed
 
     while hero.health > 0:
@@ -45,34 +44,25 @@ def run_game():
         if go_to_shop == 'sklep':
             shop()
 
-        if hero.lvl <= 5:
-            monster = Rat('szczur')
-        elif 6 <= hero.lvl <= 15:
-            monster = Ogre('ogr')
+        monster = Monster()
+
+        monster.monster_type(hero)
+        if monsters_killed == 2:
+            monster.boss()
         else:
-            monster = Troll('troll')
+            print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster.type.name}a, \n'
+                  f'Odpornośc na: {monster.type.immune}\n')
 
         if hero.armor is not None:
             hero.add_armor_bonus()
 
-        if monsters_killed == 8:
-            monster.max_health *= 2
-            monster.min_dmg *= 2
-            monster.max_dmg *= 2
-            print(f'Trafiasz na zmutowany gatunek {monster.monster_name},który posiada zwiekszone życie i obrażenia.\n'
-                  'Bądź ostrożny.\n')
-            monsters_killed = 0
-        else:
-            print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster}a, \n'
-                  f'Odpornośc na: {monster.immune}')
-
         hero.health = hero.max_health
         hero.mana = hero.max_mana
 
-        while monster.health > 0:
+        while monster.type.health > 0:
 
-            print(f'\nMasz {hero.health} punktów życia i {hero.mana} punktów many.\n')
-            print(f'Potwór posiada {monster.health} punktów życia.\n')
+            print(f'Masz {hero.health} punktów życia i {hero.mana} punktów many.\n')
+            print(f'Potwór posiada {monster.type.health} punktów życia.\n')
 
             while True:
                 attack = int(input('Wybierz 1 jeżeli chcesz zaatakować mieczem.\n'
@@ -84,7 +74,7 @@ def run_game():
 
             if attack == 1:
                 hero.sword_attack()
-                hero.hit(monster)
+                hero.hit(monster.type)
                 print(f'Atakujesz wroga za pomocą miecza za {hero.dmg_done} punktów życia.\n')
             elif attack == 2:
                 print('\nTwoje czary to:\n')
@@ -93,26 +83,26 @@ def run_game():
                 print('-' * 20 + '\n')
                 if hero.has_spell_potion(hero.spells.values(), choose_spell):
                     get_spell = hero.spells.get(choose_spell)
-                    if not monster.has_immune(get_spell, hero):
+                    if not monster.type.has_immune(get_spell, hero):
                         hero.spell_attack(get_spell)
-                        hero.hit(monster)
+                        hero.hit(monster.type)
                         print(f'Atakujesz wroga za pomocą {choose_spell} za {hero.dmg_done} punktów życia.\n')
                     else:
-                        print(f'{monster.monster_name} posiada niewrażliwość na {monster.immune}\n')
+                        print(f'{monster.type.name} posiada niewrażliwość na {monster.type.immune}\n')
             elif attack == 3:
                 hero.show_potions()
                 choose_potion = input('Wybierz miksturę, którą chcesz użyć: ')
                 print('-' * 20 + '\n')
                 if hero.has_spell_potion(hero.potions.values(), choose_potion):
                     get_potion = hero.potions.get(choose_potion)
-                    hero.potion_used = hero.use_potion(get_potion, monster)
-            if monster.health > 0:
-                monster.attack()
-                monster.hit(hero)
+                    hero.potion_used = hero.use_potion(get_potion, monster.type)
+            if monster.type.health > 0:
+                monster.type.attack()
+                monster.type.hit(hero)
             else:
                 monster.die()
                 monsters_killed += 1
-                monster.get_exp_and_gold(hero)
+                monster.type.get_exp_and_gold(hero)
                 if hero.lvl_up():
                     print(f'Awansujesz na poziom {hero.lvl}\n')
                     print(f'Twoje życie i mana zwiekszją się. Teraz wynoszą: {hero.max_health} i {hero.max_mana}\n')

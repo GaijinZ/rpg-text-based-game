@@ -16,8 +16,8 @@ class Weapon:
 
 class RustedSword(Weapon):
     name = 'rusted sword'
-    min_dmg = 4
-    max_dmg = 6
+    min_dmg = 5
+    max_dmg = 7
     gold_required = 0
     lvl_required = 1
 

@@ -2,13 +2,33 @@ import random
 
 
 class Monster:
-    monster_name = None
+    name = None
     max_health = 0
-    health = 0
+    health = max_health
     min_dmg = 0
     max_dmg = 0
     dmg_done = 0
     immune = None
+    type = None
+    deaths = 0
+
+    def monster_type(self, hero):
+        if hero.lvl <= 5:
+            self.type = Rat('szczur')
+        elif 6 <= hero.lvl <= 15:
+            self.type = Ogre('ogr')
+        else:
+            self.type = Troll('troll')
+        return self.type
+
+    def boss(self):
+        self.type.max_health *= 2
+        self.type.health = self.type.max_health
+        self.type.min_dmg *= 2
+        self.type.max_dmg *= 2
+        print(f'Trafiasz na zmutowany gatunek {self.type.name}a,który posiada zwiekszone życie i obrażenia.\n'
+              'Bądź ostrożny.\n')
+        return True
 
     def attack(self):
         self.dmg_done = random.randint(self.min_dmg, self.max_dmg)
@@ -20,7 +40,9 @@ class Monster:
         print(f'Potwór kontratakuje za {self.dmg_done} obrażeń')
 
     def die(self):
+        self.deaths += 1
         print('Zabiłeś potwora.\n')
+        return self.deaths
 
     def get_exp_and_gold(self, hero):
         pass
@@ -31,7 +53,7 @@ class Monster:
             return True
 
     def __str__(self):
-        return self.monster_name
+        return self.name
 
 
 class Rat(Monster):
@@ -41,8 +63,8 @@ class Rat(Monster):
     max_dmg = 15
     immune = 'ogień'
 
-    def __init__(self, monster_name):
-        self.monster_name = monster_name
+    def __init__(self, name):
+        self.name = name
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(10, 15)
@@ -60,8 +82,8 @@ class Ogre(Monster):
     dmg_done = 0
     immune = 'zimno'
 
-    def __init__(self, monster_name):
-        self.monster_name = monster_name
+    def __init__(self, name):
+        self.name = name
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(10, 20)
@@ -78,8 +100,8 @@ class Troll(Monster):
     max_dmg = 80
     immune = 'ogień'
 
-    def __init__(self, monster_name):
-        self.monster_name = monster_name
+    def __init__(self, name):
+        self.name = name
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(20, 35)

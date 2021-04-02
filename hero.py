@@ -15,7 +15,7 @@ class Hero:
     gold = 0
     exp = 0
     lvl = 1
-    level_up = 250
+    level_up = 20
 
     dmg_done = 0
 
@@ -32,8 +32,8 @@ class Hero:
         print(f'Jestem {self.name}, przybyłem by zabijać potwory i palić wiedźmy.\n')
 
     def get_basic_weapon(self):
-        weapon = RustedSword()
-        return weapon
+        self.weapon = RustedSword()
+        return self.weapon
 
     def sword_attack(self):
         if self.mana >= self.max_mana:
@@ -96,8 +96,8 @@ class Hero:
         monster.health -= self.dmg_done
 
     def add_armor_bonus(self):
-        self.max_health += self.armor[0].health
-        self.defence += self.armor[0].defence
+        self.max_health += self.armor.health
+        self.defence += self.armor.defence
 
     def use_potion(self, potion, monster):
         if potion == healing_potion:
