@@ -10,7 +10,6 @@ class Monster:
     dmg_done = 0
     immune = None
     type = None
-    deaths = 0
 
     def monster_type(self, hero):
         if hero.lvl <= 5:
@@ -40,9 +39,7 @@ class Monster:
         print(f'Potwór kontratakuje za {self.dmg_done} obrażeń')
 
     def die(self):
-        self.deaths += 1
         print('Zabiłeś potwora.\n')
-        return self.deaths
 
     def get_exp_and_gold(self, hero):
         pass
@@ -61,7 +58,7 @@ class Rat(Monster):
     health = max_health
     min_dmg = 5
     max_dmg = 15
-    immune = 'ogień'
+    immune = 'zimno'
 
     def __init__(self, name):
         self.name = name
@@ -80,7 +77,7 @@ class Ogre(Monster):
     min_dmg = 20
     max_dmg = 30
     dmg_done = 0
-    immune = 'zimno'
+    immune = 'ogień'
 
     def __init__(self, name):
         self.name = name

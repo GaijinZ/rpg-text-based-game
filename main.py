@@ -77,14 +77,15 @@ def run_game():
                 hero.hit(monster.type)
                 print(f'Atakujesz wroga za pomocą miecza za {hero.dmg_done} punktów życia.\n')
             elif attack == 2:
-                print('\nTwoje czary to:\n')
+                print('Twoje czary to:\n')
                 hero.show_skills()
-                choose_spell = input('\nWpisz nazwę czaru, którym chcesz zaatakować: ')
+                choose_spell = input('Wpisz nazwę czaru, którym chcesz zaatakować: ')
                 print('-' * 20 + '\n')
-                if hero.has_spell_potion(hero.spells.values(), choose_spell):
-                    get_spell = hero.spells.get(choose_spell)
+                if hero.has_spell_potion(hero.spells, choose_spell):
+                    get_spell = hero.get_spell_class()
                     if not monster.type.has_immune(get_spell, hero):
-                        hero.spell_attack(get_spell)
+                        get_spell.additional_effect()
+                        hero.spell_attack()
                         hero.hit(monster.type)
                         print(f'Atakujesz wroga za pomocą {choose_spell} za {hero.dmg_done} punktów życia.\n')
                     else:

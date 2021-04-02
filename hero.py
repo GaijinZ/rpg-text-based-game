@@ -18,6 +18,7 @@ class Hero:
     level_up = 20
 
     dmg_done = 0
+    get_spell_class = None
 
     armor = None
     weapon = None
@@ -54,16 +55,16 @@ class Hero:
         return True
 
     def buy_from_shop(self, buy_item):
-        if buy_item in items_to_buy.get('weapons'):
+        if buy_item.name in items_to_buy['weapons']:
             self.weapon = buy_item
             return self.weapon
-        if buy_item in items_to_buy.get('armors'):
+        if buy_item.name in items_to_buy.get('armors'):
             self.armor = buy_item
             return self.armor
-        if buy_item in items_to_buy.get('spells'):
+        if buy_item.name in items_to_buy.get('spells'):
             self.spells[buy_item.name] = buy_item
             return self.spells
-        if buy_item in items_to_buy.get('potions'):
+        if buy_item.name in items_to_buy.get('potions'):
             self.potions[buy_item.name] = buy_item
             return self.potions
 
@@ -72,22 +73,23 @@ class Hero:
             item_group = self.spells
         elif item_group == self.potions:
             item_group = self.potions
-        for key, value in item_group.items():
-            if choose_name == key:
-                return value
+        get_value = item_group.get(choose_name)
+        self.get_spell_class = type(get_value)
+        return self.get_spell_class
 
-    def spell_attack(self, spell_name):
-        if spell_name.mana > self.mana:
-            print('\nNie mie masz wystarczającej ilości many.\n')
+    def spell_attack(self):
+        spell_instance = self.get_spell_class()
+        if spell_instance.mana > self.mana:
+            print('Nie mie masz wystarczającej ilości many.\n')
             return False
-        if spell_name == 'holy_light':
-            self.mana -= spell_name.mana
+        if spell_instance.name == 'holy_light':
+            self.mana -= spell_instance.mana
             self.health = self.max_health
             print('Uzupełiasz życie.\n')
             return True
-        self.mana -= spell_name.mana
-        min_dmg = spell_name.min_dmg
-        max_dmg = spell_name.max_dmg
+        self.mana -= spell_instance.mana
+        min_dmg = spell_instance.min_dmg
+        max_dmg = spell_instance.max_dmg
         spell_dmg = random.randint(min_dmg, max_dmg)
         self.dmg_done += spell_dmg + self.base_spell_dmg
         return self.dmg_done
