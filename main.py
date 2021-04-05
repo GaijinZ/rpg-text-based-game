@@ -17,6 +17,8 @@ def run_game():
                                    'Wybierz 0 aby wyświetlić bestiariusz.\n'
                                    'Aby wyjść naciśnij ENTER.\n')
                 print('-' * 20 + '\n')
+                if start_shop == '':
+                    break
 
                 if start_shop == '0':
                     for monster_info in monsters.values():
@@ -37,7 +39,7 @@ def run_game():
                             return False
                         buy_item = items_to_buy.get(item_category).get(item_name)
                         if item_name != str(buy_item):
-                            print('Nie ma takiego przedmiotu.\n')
+                            print('\nNie ma takiego przedmiotu.\n')
                             break
                         if hero.has_gold_lvl_required(buy_item):
                             hero.buy_from_shop(buy_item)
@@ -82,34 +84,39 @@ def run_game():
 
             if attack == 1:
                 hero.sword_attack()
-                hero.hit(monster.type)
-                print(f'Atakujesz wroga za pomocą miecza za {hero.dmg_done} punktów życia.\n')
+                if hero.potion_choice is not None:
+                    hero.potion_choice.use_potion(hero, monster.type)
+                    hero.hit(monster.type)
+                else:
+                    hero.hit(monster.type)
             elif attack == 2:
                 print('Twoje czary to:\n')
                 hero.show_skills()
                 choose_spell = input('Wpisz nazwę czaru, którym chcesz zaatakować: ')
                 print('-' * 20 + '\n')
-                if hero.has_spell_potion(hero.spells, choose_spell):
+                if hero.has_spell(choose_spell):
                     get_spell = hero.get_spell_class()
                     if not monster.type.has_immune(get_spell, hero):
                         get_spell.additional_effect()
                         hero.spell_attack()
-                        hero.hit(monster.type)
-                        print(f'Atakujesz wroga za pomocą {choose_spell} za {hero.dmg_done} punktów życia.\n')
+                        if hero.potion_choice is not None:
+                            hero.potion_choice.use_potion()
+                            hero.hit(monster.type)
+                        else:
+                            hero.hit(monster.type)
                     else:
                         print(f'{monster.type.name} posiada niewrażliwość na {monster.type.immune}\n')
             elif attack == 3:
                 hero.show_potions()
-                choose_potion = input('Wybierz miksturę, którą chcesz użyć: ')
+                choose_potion = input('\nWybierz miksturę, którą chcesz użyć: ')
                 print('-' * 20 + '\n')
-                if hero.has_spell_potion(hero.potions.values(), choose_potion):
-                    get_potion = hero.potions.get(choose_potion)
-                    hero.potion_used = hero.use_potion(get_potion, monster.type)
+                if hero.has_potion(choose_potion):
+                    hero.use_potion(choose_potion)
             if monster.type.health > 0:
                 monster.type.attack()
                 monster.type.hit(hero)
             else:
-                monster.die()
+                monster.type.die()
                 monsters_killed += 1
                 monster.type.get_exp_and_gold(hero)
                 if hero.lvl_up():

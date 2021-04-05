@@ -45,7 +45,6 @@ items_to_buy = {
                'meteor': meteor},
     'potions': {'healing potion': healing_potion,
                 'mana potion': mana_potion,
-                'reduced mana potion': reduced_mana_potion,
                 'double dmg potion': double_dmg_potion,
                 'ignore immune': ignore_immune},
 }

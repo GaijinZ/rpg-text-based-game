@@ -104,6 +104,9 @@ class Potion:
                f'koszt kupna {self.gold_required} sztuk złota, ' \
                f'wymagany poziom bohatera: {self.lvl_required}'
 
+    def use_potion(self, hero, monster):
+        pass
+
     def __repr__(self):
         return self.name
 
@@ -122,25 +125,27 @@ class ManaPotion(Potion):
     action = 'odnawia manę do pełna'
 
 
-class ReduceManaPotion(Potion):
-    name = 'reduced mana potion'
-    gold_required = 8
-    lvl_required = 3
-    action = ' zmniejsza koszt rzucenia czaru o połowę'
-
-
 class DoubleDmgPotion(Potion):
     name = 'double dmg potion'
     gold_required = 12
     lvl_required = 5
     action = 'następny atak zada podwójne obrażenia'
 
+    def use_potion(self, hero, monster):
+        hero.dmg_to_make *= 2
+        hero.potion_choice = None
+
 
 class MaxDmgAndIgnoreImmunePotion(Potion):
     name = 'ignore immune'
-    gold_required = 10
+    gold_required = 15
     lvl_required = 5
     action = 'usuwa odporność wroga, następny atak zada maksymalne obrażenia'
+
+    def use_potion(self, hero, monster):
+        monster.immune = None
+        hero.dmg_done = hero.weapon.max_dmg
+        hero.potion_choice = None
 
 
 giant_sword = GiantSword()

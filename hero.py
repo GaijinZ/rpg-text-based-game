@@ -17,8 +17,9 @@ class Hero:
     lvl = 1
     level_up = 20
 
-    dmg_done = 0
+    dmg_to_make = 0
     get_spell_class = None
+    potion_choice = None
 
     armor = None
     weapon = None
@@ -41,8 +42,8 @@ class Hero:
             self.mana = self.max_mana
         self.mana += 5
         weapon_dmg = random.randint(self.weapon.min_dmg, self.weapon.max_dmg)
-        self.dmg_done = weapon_dmg + self.base_weapon_dmg
-        return self.dmg_done
+        self.dmg_to_make = weapon_dmg + self.base_weapon_dmg
+        return self.dmg_to_make
 
     def has_gold_lvl_required(self, buy_item):
         if buy_item.gold_required > self.gold:
@@ -55,7 +56,7 @@ class Hero:
         return True
 
     def buy_from_shop(self, buy_item):
-        if buy_item.name in items_to_buy['weapons']:
+        if buy_item.name in items_to_buy.get('weapons'):
             self.weapon = buy_item
             return self.weapon
         if buy_item.name in items_to_buy.get('armors'):
@@ -68,57 +69,50 @@ class Hero:
             self.potions[buy_item.name] = buy_item
             return self.potions
 
-    def has_spell_potion(self, item_group, choose_name):
-        if item_group == self.spells:
-            item_group = self.spells
-        elif item_group == self.potions:
-            item_group = self.potions
-        get_value = item_group.get(choose_name)
+    def has_spell(self, choose_spell):
+        get_value = self.spells.get(choose_spell)
         self.get_spell_class = type(get_value)
         return self.get_spell_class
 
     def spell_attack(self):
-        spell_instance = self.get_spell_class()
-        if spell_instance.mana > self.mana:
+        spell = self.get_spell_class()
+        if spell.mana > self.mana:
             print('Nie mie masz wystarczającej ilości many.\n')
             return False
-        if spell_instance.name == 'holy_light':
-            self.mana -= spell_instance.mana
+        if spell.name == 'holy_light':
+            self.mana -= spell.mana
             self.health = self.max_health
             print('Uzupełiasz życie.\n')
             return True
-        self.mana -= spell_instance.mana
-        min_dmg = spell_instance.min_dmg
-        max_dmg = spell_instance.max_dmg
+        self.mana -= spell.mana
+        min_dmg = spell.min_dmg
+        max_dmg = spell.max_dmg
         spell_dmg = random.randint(min_dmg, max_dmg)
-        self.dmg_done += spell_dmg + self.base_spell_dmg
-        return self.dmg_done
+        self.dmg_to_make += spell_dmg + self.base_spell_dmg
+        return self.dmg_to_make
 
     def hit(self, monster):
-        monster.current_health -= self.dmg_done
+        monster.current_health -= self.dmg_to_make
+        print(f'Atakujesz wroga za pomocą miecza za {self.dmg_to_make} punktów życia.\n')
 
     def add_armor_bonus(self):
         self.max_health += self.armor.health
         self.defence += self.armor.defence
 
-    def use_potion(self, potion, monster):
-        if potion == healing_potion:
+    def has_potion(self, choose_potion):
+        return self.potions.get(choose_potion)
+
+    def use_potion(self, choose_potion):
+        if choose_potion == 'healing potion':
             self.health = self.max_health
             print('Uzpupełnisaz życie.\n')
-            print(self.potions)
-        if potion == mana_potion:
+        elif choose_potion == 'mana potion':
             self.mana = self.max_mana
             print('Uzpupełnisaz manę.\n')
-        # if potion == reduced_mana_potion:
-        # spell_name.mana /= 0.5
-        # print('Redukujesz manę o połowę przy następnym użyciu czaru.\n')
-        if potion == double_dmg_potion:
-            self.dmg_done *= 2
-        if potion == ignore_immune:
-            monster.immune = None
-            self.dmg_done = self.weapon[0].max_dmg
-        del self.potions[potion.name]
-        print(self.potions)
+        else:
+            get_value = self.potions.get(choose_potion)
+            self.potion_choice = get_value
+        del self.potions[choose_potion]
 
     def lvl_up(self):
         if self.exp >= self.level_up:
@@ -127,7 +121,6 @@ class Hero:
             self.lvl += 1
             self.level_up *= 1.4
             return True
-        return False
 
     def spend_points(self):
         print('Dostajesz 2 punkty do rozdania do swoich atrbutów.\n'
