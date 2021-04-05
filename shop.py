@@ -1,6 +1,6 @@
 from spells import Fireball, IceBolt, Blizzard, Earthquake, Meteor, HealingSpell
 from items import GiantSword, LeviathanAxe, WarScythe, BladeOfChaos, MagePlate, ArchonPlate, \
-    HeavyPlate, HealingPotion, ManaPotion, ReduceManaPotion, DoubleDmgPotion, MaxDmgAndIgnoreImmunePotion
+    HeavyPlate, HealingPotion, ManaPotion, DoubleDmgPotion, MaxDmgAndIgnoreImmunePotion
 from enemy import Rat, Ogre, Troll
 
 giant_sword = GiantSword()
@@ -14,7 +14,6 @@ heavy_plate = HeavyPlate()
 
 healing_potion = HealingPotion()
 mana_potion = ManaPotion()
-reduced_mana_potion = ReduceManaPotion()
 double_dmg_potion = DoubleDmgPotion()
 ignore_immune = MaxDmgAndIgnoreImmunePotion()
 

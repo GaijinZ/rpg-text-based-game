@@ -43,7 +43,8 @@ def run_game():
                             break
                         if hero.has_gold_lvl_required(buy_item):
                             hero.buy_from_shop(buy_item)
-                            del items_to_buy[item_category][item_name]
+                            if item_category != 'potions':
+                                del items_to_buy[item_category][item_name]
                             print(f'{item_name} został dodany do Twoich przedmiotów.\n')
                             break
 

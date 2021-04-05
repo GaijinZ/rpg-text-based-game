@@ -5,14 +5,14 @@ from shop import items_to_buy
 
 
 class Hero:
-    max_health = 50
+    max_health = 500
     health = max_health
     max_mana = 30
     mana = max_mana
     defence = 0
     base_weapon_dmg = 0
     base_spell_dmg = 0
-    gold = 0
+    gold = 100
     exp = 0
     lvl = 1
     level_up = 20

@@ -159,7 +159,6 @@ heavy_plate = HeavyPlate()
 
 healing_potion = HealingPotion()
 mana_potion = ManaPotion()
-reduced_mana_potion = ReduceManaPotion()
 double_dmg_potion = DoubleDmgPotion()
 ignore_immune = MaxDmgAndIgnoreImmunePotion()
 
@@ -169,6 +168,5 @@ armors_available = [mage_plate, archon_plate, heavy_plate]
 
 potions_available = {'healing_potion': healing_potion,
                      'mana_potion': mana_potion,
-                     'reduced_mana_potion': reduced_mana_potion,
                      'double_dmg_potion': double_dmg_potion,
                      'ignore_immune': ignore_immune}
