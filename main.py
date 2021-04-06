@@ -31,6 +31,14 @@ def run_game():
                             print(items.description())
 
                     while True:
+                        spells_effects = input(
+                            '\nAby dowiedzieć się więcej o dodatkowych efektach czarów wpisz "efekty",'
+                            ' wciśnij ENTER aby przejśc dalej ').lower()
+
+                        if spells_effects == 'efekty':
+                            for i in items_to_buy.get('spells').values():
+                                print(i.additional_effect_info)
+
                         item_category = input('\nWpisz kategorię przedmiotu: ').lower()
                         item_name = input('\nWpisz nazwę przedmiotu, który chcesz kupić: ').lower()
                         print('-' * 20 + '\n')
@@ -96,10 +104,10 @@ def run_game():
                 choose_spell = input('Wpisz nazwę czaru, którym chcesz zaatakować: ')
                 print('-' * 20 + '\n')
                 if hero.has_spell(choose_spell):
-                    get_spell = hero.get_spell_class()
-                    if not monster.type.has_immune(get_spell, hero):
-                        get_spell.additional_effect()
-                        hero.spell_attack()
+                    spell = hero.get_spell_class()
+                    if not monster.type.has_immune(spell, hero):
+                        spell.additional_effect(monster.type)
+                        hero.spell_attack(spell)
                         if hero.potion_choice is not None:
                             hero.potion_choice.use_potion()
                             hero.hit(monster.type)
@@ -114,8 +122,12 @@ def run_game():
                 if hero.has_potion(choose_potion):
                     hero.use_potion(choose_potion)
             if monster.type.health > 0:
-                monster.type.attack()
-                monster.type.hit(hero)
+                if monster.type.frozen > 0:
+                    print('Potwór zamrożony, nie odnosisz obrażeń.\n')
+                    monster.type.frozen -= 1
+                else:
+                    monster.type.attack()
+                    monster.type.hit(hero)
             else:
                 monster.type.die()
                 monsters_killed += 1

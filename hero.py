@@ -5,14 +5,14 @@ from shop import items_to_buy
 
 
 class Hero:
-    max_health = 500
+    max_health = 50
     health = max_health
     max_mana = 30
     mana = max_mana
     defence = 0
     base_weapon_dmg = 0
     base_spell_dmg = 0
-    gold = 100
+    gold = 0
     exp = 0
     lvl = 1
     level_up = 20
@@ -70,12 +70,13 @@ class Hero:
             return self.potions
 
     def has_spell(self, choose_spell):
-        get_value = self.spells.get(choose_spell)
-        self.get_spell_class = type(get_value)
-        return self.get_spell_class
+        if choose_spell in self.spells:
+            get_value = self.spells.get(choose_spell)
+            self.get_spell_class = type(get_value)
+            return self.get_spell_class
+        print('Nie masz takiego czaru.\n')
 
-    def spell_attack(self):
-        spell = self.get_spell_class()
+    def spell_attack(self, spell):
         if spell.mana > self.mana:
             print('Nie mie masz wystarczającej ilości many.\n')
             return False
@@ -88,12 +89,12 @@ class Hero:
         min_dmg = spell.min_dmg
         max_dmg = spell.max_dmg
         spell_dmg = random.randint(min_dmg, max_dmg)
-        self.dmg_to_make += spell_dmg + self.base_spell_dmg
+        self.dmg_to_make = spell_dmg + self.base_spell_dmg
         return self.dmg_to_make
 
     def hit(self, monster):
         monster.current_health -= self.dmg_to_make
-        print(f'Atakujesz wroga za pomocą miecza za {self.dmg_to_make} punktów życia.\n')
+        print(f'Atakujesz wroga za {self.dmg_to_make} punktów życia.\n')
 
     def add_armor_bonus(self):
         self.max_health += self.armor.health
@@ -154,7 +155,7 @@ class Hero:
 
     def show_skills(self):
         if not self.spells:
-            print('Nie posiadasz nauczonych czarów')
+            print('Nie posiadasz nauczonych czarów\n')
             return False
         for spell, value in self.spells.items():
             print(f'{spell} obrażenia od {value.min_dmg} do {value.max_dmg},'

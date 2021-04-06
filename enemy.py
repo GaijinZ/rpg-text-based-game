@@ -13,6 +13,7 @@ class Monster:
     immune = None
     type = None
     occurs = None
+    frozen = 0
 
     def bestiary(self):
         return f'{self.name} - maksymalne życie {self.max_health}, obrażenia od {self.min_dmg} '\
@@ -44,7 +45,7 @@ class Monster:
     def hit(self, hero):
         self.dmg_done -= hero.defence
         hero.health -= self.dmg_done
-        print(f'Potwór kontratakuje za {self.dmg_done} obrażeń')
+        print(f'Potwór kontratakuje za {self.dmg_done} obrażeń\n')
 
     def die(self):
         print('Zabiłeś potwora.\n')
@@ -62,14 +63,14 @@ class Monster:
 
 
 class Rat(Monster):
-    min_health = 15
-    max_health = 25
+    min_health = 150
+    max_health = 250
     health = random.randint(min_health, max_health)
     current_health = health
     health = max_health
     min_dmg = 5
     max_dmg = 15
-    immune = 'zimno'
+    immune = None
     occurs = 'lasy'
 
     def __init__(self, name):
