@@ -1,4 +1,10 @@
 import random
+from enum import Enum
+
+
+class Immune(Enum):
+    FIRE = 1
+    COLD = 2
 
 
 class Monster:
@@ -17,7 +23,7 @@ class Monster:
 
     def bestiary(self):
         return f'{self.name} - maksymalne życie {self.max_health}, obrażenia od {self.min_dmg} '\
-               f'do {self.max_dmg}, odporność na {self.immune}, pojawia się: {self.occurs}.\n'
+               f'do {self.max_dmg}, odporność na {self.immune.keys()}, pojawia się: {self.occurs}.\n'
 
     def monster_type(self, hero):
         if hero.lvl <= 5:
@@ -63,15 +69,15 @@ class Monster:
 
 
 class Rat(Monster):
-    min_health = 150
-    max_health = 250
+    min_health = 15
+    max_health = 25
     health = random.randint(min_health, max_health)
     current_health = health
     health = max_health
     min_dmg = 5
     max_dmg = 15
-    immune = None
     occurs = 'lasy'
+    immune = Immune.COLD
 
     def __init__(self, name):
         self.name = name
@@ -92,8 +98,8 @@ class Ogre(Monster):
     min_dmg = 20
     max_dmg = 30
     dmg_done = 0
-    immune = 'ogień'
     occurs = 'bagna'
+    immune = Immune.FIRE
 
     def __init__(self, name):
         self.name = name
@@ -113,8 +119,8 @@ class Troll(Monster):
     current_health = health
     min_dmg = 40
     max_dmg = 80
-    immune = 'ogień'
     occurs = 'jaskinie'
+    immune = Immune.FIRE
 
     def __init__(self, name):
         self.name = name

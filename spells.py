@@ -1,4 +1,5 @@
 import random
+from enemy import Immune
 
 
 class Spell:
@@ -26,7 +27,7 @@ class Spell:
 
 class Fireball(Spell):
     name = 'fireball'
-    dmg_type = 'ogień'
+    dmg_type = Immune.FIRE
     min_dmg = 5
     max_dmg = 10
     mana = 5
@@ -44,7 +45,7 @@ class Fireball(Spell):
 
 class IceBolt(Spell):
     name = 'ice bolt'
-    dmg_type = 'zimno'
+    dmg_type = Immune.COLD
     min_dmg = 6
     max_dmg = 15
     mana = 7
@@ -61,7 +62,7 @@ class IceBolt(Spell):
 
 class Blizzard(Spell):
     name = 'blizzard'
-    dmg_type = 'zimno'
+    dmg_type = Immune.COLD
     min_dmg = 15
     max_dmg = 22
     mana = 10
@@ -78,7 +79,7 @@ class Blizzard(Spell):
 
 class Earthquake(Spell):
     name = 'earthquake'
-    dmg_type = 'ziemia'
+    dmg_type = Immune.PSYCHICAL
     min_dmg = 25
     max_dmg = 30
     mana = 15
@@ -95,7 +96,7 @@ class Earthquake(Spell):
 
 class Meteor(Spell):
     name = 'meteor'
-    dmg_type = 'ogień'
+    dmg_type = Immune.FIRE
     min_dmg = 30
     max_dmg = 40
     mana = 30

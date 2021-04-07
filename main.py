@@ -66,7 +66,7 @@ def run_game():
         monster = Monster()
 
         monster.monster_type(hero)
-        if monsters_killed == 2:
+        if monsters_killed == 8:
             monster.boss()
         else:
             print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster.type.name}a, \n'
