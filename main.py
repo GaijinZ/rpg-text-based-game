@@ -1,10 +1,11 @@
 from hero import Hero
 from enemy import Monster
-from shop import items_to_buy, monsters
+from shop import monster_info, items_to_view, purchase_items
 
 
 def run_game():
-    global monsters_killed
+
+    monsters_killed = 0
 
     while hero.health > 0:
         def shop():
@@ -21,40 +22,12 @@ def run_game():
                     break
 
                 if start_shop == '0':
-                    for monster_info in monsters.values():
-                        print(monster_info.bestiary())
+                    monster_info()
 
                 if start_shop == '1':
-                    for key, value in items_to_buy.items():
-                        print(f'\n{key}\n')
-                        for items in value.values():
-                            print(items.description())
+                    items_to_view()
 
-                    while True:
-                        spells_effects = input(
-                            '\nAby dowiedzieć się więcej o dodatkowych efektach czarów wpisz "efekty",'
-                            ' wciśnij ENTER aby przejśc dalej ').lower()
-
-                        if spells_effects == 'efekty':
-                            for i in items_to_buy.get('spells').values():
-                                print(i.additional_effect_info)
-
-                        item_category = input('\nWpisz kategorię przedmiotu: ').lower()
-                        item_name = input('\nWpisz nazwę przedmiotu, który chcesz kupić: ').lower()
-                        print('-' * 20 + '\n')
-
-                        if item_name == '':
-                            return False
-                        buy_item = items_to_buy.get(item_category).get(item_name)
-                        if item_name != str(buy_item):
-                            print('\nNie ma takiego przedmiotu.\n')
-                            break
-                        if hero.has_gold_lvl_required(buy_item):
-                            hero.buy_from_shop(buy_item)
-                            if item_category != 'potions':
-                                del items_to_buy[item_category][item_name]
-                            print(f'{item_name} został dodany do Twoich przedmiotów.\n')
-                            break
+                    purchase_items(hero)
 
         print(f'Posiadasz {hero.gold} sztuk złota.\n')
         go_to_shop = input('Wpisz "sklep" aby przejsc do sklepu '
@@ -63,25 +36,24 @@ def run_game():
         if go_to_shop == 'sklep':
             shop()
 
-        monster = Monster()
+        monster = Monster().monster_type(hero.lvl)
 
-        monster.monster_type(hero)
         if monsters_killed == 8:
             monster.boss()
         else:
-            print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster.type.name}a, \n'
-                  f'Odpornośc na: {monster.type.immune}\n')
+            print(f'Wędrując przez krainę natknąłeś się na ogromnego, brzydkiego {monster.name}a, \n'
+                  f'Odpornośc na: {monster.immune}\n')
 
-        if hero.armor is not None:
+        if hero.armor:
             hero.add_armor_bonus()
 
         hero.health = hero.max_health
         hero.mana = hero.max_mana
 
-        while monster.type.current_health > 0:
+        while monster.current_health > 0:
 
             print(f'Masz {hero.health} punktów życia i {hero.mana} punktów many.\n')
-            print(f'Potwór posiada {monster.type.current_health} punktów życia.\n')
+            print(f'Potwór posiada {monster.current_health} punktów życia.\n')
 
             while True:
                 attack = int(input('Wybierz 1 jeżeli chcesz zaatakować mieczem.\n'
@@ -94,10 +66,10 @@ def run_game():
             if attack == 1:
                 hero.sword_attack()
                 if hero.potion_choice is not None:
-                    hero.potion_choice.use_potion(hero, monster.type)
-                    hero.hit(monster.type)
+                    hero.potion_choice.use_potion(hero, monster)
+                    hero.hit(monster)
                 else:
-                    hero.hit(monster.type)
+                    hero.hit(monster)
             elif attack == 2:
                 print('Twoje czary to:\n')
                 hero.show_skills()
@@ -105,33 +77,33 @@ def run_game():
                 print('-' * 20 + '\n')
                 if hero.has_spell(choose_spell):
                     spell = hero.get_spell_class()
-                    if not monster.type.has_immune(spell, hero):
-                        spell.additional_effect(monster.type)
+                    if not monster.has_immune(spell, hero):
+                        spell.additional_effect(monster)
                         hero.spell_attack(spell)
                         if hero.potion_choice is not None:
                             hero.potion_choice.use_potion()
-                            hero.hit(monster.type)
+                            hero.hit(monster)
                         else:
-                            hero.hit(monster.type)
+                            hero.hit(monster)
                     else:
-                        print(f'{monster.type.name} posiada niewrażliwość na {monster.type.immune}\n')
+                        print(f'{monster.name} posiada niewrażliwość na {monster.immune}\n')
             elif attack == 3:
                 hero.show_potions()
                 choose_potion = input('\nWybierz miksturę, którą chcesz użyć: ')
                 print('-' * 20 + '\n')
                 if hero.has_potion(choose_potion):
                     hero.use_potion(choose_potion)
-            if monster.type.health > 0:
-                if monster.type.frozen > 0:
+            if monster.current_health > 0:
+                if monster.frozen > 0:
                     print('Potwór zamrożony, nie odnosisz obrażeń.\n')
-                    monster.type.frozen -= 1
+                    monster.frozen -= 1
                 else:
-                    monster.type.attack()
-                    monster.type.hit(hero)
+                    monster.attack()
+                    monster.hit(hero)
             else:
-                monster.type.die()
+                monster.die()
                 monsters_killed += 1
-                monster.type.get_exp_and_gold(hero)
+                monster.get_exp_and_gold(hero)
                 if hero.lvl_up():
                     print(f'Awansujesz na poziom {hero.lvl}\n')
                     print(f'Twoje życie i mana zwiekszją się. Teraz wynoszą: {hero.max_health} i {hero.max_mana}\n')
@@ -150,8 +122,6 @@ if __name__ == '__main__':
     hero.say_hello()
 
     hero.get_basic_weapon()
-
-    monsters_killed = 0
 
     print('Przemierzasz świat aby ratować wioski i zabijać potwory, które je nękają...\n')
 

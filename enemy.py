@@ -5,42 +5,41 @@ from enum import Enum
 class Immune(Enum):
     FIRE = 1
     COLD = 2
+    PSYCHICAL = 3
 
 
 class Monster:
     name = None
     min_health = 0
     max_health = 0
-    health = random.randint(min_health, max_health)
-    current_health = health
+    current_health = 0
     min_dmg = 0
     max_dmg = 0
     dmg_done = 0
     immune = None
-    type = None
     occurs = None
     frozen = 0
 
+    def __init__(self):
+        self.current_health = random.randint(self.min_health, self.max_health)
+
     def bestiary(self):
         return f'{self.name} - maksymalne życie {self.max_health}, obrażenia od {self.min_dmg} '\
-               f'do {self.max_dmg}, odporność na {self.immune.keys()}, pojawia się: {self.occurs}.\n'
+               f'do {self.max_dmg}, odporność na {self.immune}, pojawia się: {self.occurs}.\n'
 
     def monster_type(self, hero):
-        if hero.lvl <= 5:
-            self.type = Rat('Szczur')
-        elif 6 <= hero.lvl <= 15:
-            self.type = Ogre('Ogr')
+        if hero <= 5:
+            return Rat()
+        elif 6 <= hero <= 15:
+            return Ogre()
         else:
-            self.type = Troll('Troll')
-        return self.type
+            return Troll()
 
     def boss(self):
-        self.type.min_health *= 2
-        self.type.max_health *= 2
-        self.type.current_health = self.type.health
-        self.type.min_dmg *= 2
-        self.type.max_dmg *= 2
-        print(f'Trafiasz na zmutowany gatunek {self.type.name}a,który posiada zwiekszone życie i obrażenia.\n'
+        self.current_health *= 2
+        self.min_dmg *= 2
+        self.max_dmg *= 2
+        print(f'Trafiasz na zmutowany gatunek {self.name}a,który posiada zwiekszone życie i obrażenia.\n'
               'Bądź ostrożny.\n')
         return True
 
@@ -69,18 +68,17 @@ class Monster:
 
 
 class Rat(Monster):
+    name = 'Szczur'
     min_health = 15
     max_health = 25
-    health = random.randint(min_health, max_health)
-    current_health = health
-    health = max_health
+    current_health = 0
     min_dmg = 5
     max_dmg = 15
     occurs = 'lasy'
     immune = Immune.COLD
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        super().__init__()
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(10, 15)
@@ -91,18 +89,18 @@ class Rat(Monster):
 
 
 class Ogre(Monster):
+    name = 'Ogr'
     min_health = 30
     max_health = 60
-    health = random.randint(min_health, max_health)
-    current_health = health
+    current_health = 0
     min_dmg = 20
     max_dmg = 30
     dmg_done = 0
     occurs = 'bagna'
     immune = Immune.FIRE
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        super().__init__()
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(10, 20)
@@ -113,17 +111,17 @@ class Ogre(Monster):
 
 
 class Troll(Monster):
+    name = 'Troll'
     min_health = 50
     max_health = 100
-    health = random.randint(min_health, max_health)
-    current_health = health
+    current_health = 0
     min_dmg = 40
     max_dmg = 80
     occurs = 'jaskinie'
     immune = Immune.FIRE
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self):
+        super().__init__()
 
     def get_exp_and_gold(self, hero):
         exp_gained = random.randint(20, 35)

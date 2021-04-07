@@ -35,7 +35,6 @@ class Hero:
 
     def get_basic_weapon(self):
         self.weapon = RustedSword()
-        return self.weapon
 
     def sword_attack(self):
         if self.mana >= self.max_mana:
@@ -55,19 +54,15 @@ class Hero:
         self.gold -= buy_item.gold_required
         return True
 
-    def buy_from_shop(self, buy_item):
-        if buy_item.name in items_to_buy.get('weapons'):
-            self.weapon = buy_item
-            return self.weapon
-        if buy_item.name in items_to_buy.get('armors'):
-            self.armor = buy_item
-            return self.armor
-        if buy_item.name in items_to_buy.get('spells'):
-            self.spells[buy_item.name] = buy_item
-            return self.spells
-        if buy_item.name in items_to_buy.get('potions'):
-            self.potions[buy_item.name] = buy_item
-            return self.potions
+    def buy_from_shop(self, item_name):
+        if item_name.name in items_to_buy['weapons']:
+            self.weapon = item_name
+        elif item_name.name in items_to_buy['armors']:
+            self.armor = item_name
+        elif item_name.name in items_to_buy['spells']:
+            self.spells[item_name.name] = item_name
+        elif item_name.name in items_to_buy['potions']:
+            self.potions[item_name.name] = item_name
 
     def has_spell(self, choose_spell):
         if choose_spell in self.spells:

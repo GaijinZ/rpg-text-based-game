@@ -24,10 +24,6 @@ holy_light = HealingSpell()
 earthquake = Earthquake()
 meteor = Meteor()
 
-rat = Rat('Szczur')
-ogre = Ogre('Ogr')
-troll = Troll('Troll')
-
 items_to_buy = {
     'weapons': {'giant sword': giant_sword,
                 'leviathan axe': leviathan_axe,
@@ -49,7 +45,47 @@ items_to_buy = {
 }
 
 monsters = {
-    'rat': rat,
-    'ogre': ogre,
-    'troll': troll,
+    'rat': Rat(),
+    'ogre': Ogre(),
+    'troll': Troll(),
 }
+
+
+def monster_info():
+    for monster_info in monsters.values():
+        print(monster_info.bestiary())
+
+
+def items_to_view():
+    for key, value in items_to_buy.items():
+        print(f'\n{key}\n')
+        for items in value.values():
+            print(items.description())
+
+
+def purchase_items(hero):
+    while True:
+        spells_effects = input(
+            '\nAby dowiedzieć się więcej o dodatkowych efektach czarów wpisz "efekty",'
+            ' wciśnij ENTER aby przejśc dalej ').lower()
+
+        if spells_effects == 'efekty':
+            for i in items_to_buy['spells'].values():
+                print(i.additional_effect_info)
+
+        item_category_to_buy = input('\nWpisz kategorię przedmiotu: ').lower()
+        item_name_to_buy = input('\nWpisz nazwę przedmiotu, który chcesz kupić: ').lower()
+        print('-' * 20 + '\n')
+
+        if item_name_to_buy == '':
+            return False
+        item_name = items_to_buy.get(item_category_to_buy).get(item_name_to_buy)
+        if item_name_to_buy != str(item_name):
+            print('\nNie ma takiego przedmiotu.\n')
+            break
+        if hero.has_gold_lvl_required(item_name):
+            hero.buy_from_shop(item_name)
+            if item_category_to_buy != 'potions':
+                del items_to_buy[item_category_to_buy][item_name_to_buy]
+            print(f'{item_name_to_buy} został dodany do Twoich przedmiotów.\n')
+            break
