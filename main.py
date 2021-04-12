@@ -1,6 +1,7 @@
 from hero import Hero
 from enemy import Monster
 from shop import monster_info, items_to_view, purchase_items
+from effects import effect_to_make
 
 
 def run_game():
@@ -52,10 +53,13 @@ def run_game():
 
         while monster.current_health > 0:
 
+            hero.check_for_effect()
+
             print(f'Masz {hero.health} punktów życia i {hero.mana} punktów many.\n')
             print(f'Potwór posiada {monster.current_health} punktów życia.\n')
 
             while True:
+
                 attack = int(input('Wybierz 1 jeżeli chcesz zaatakować mieczem.\n'
                                    'Wybierz 2 jeżeli chesz zaatakować czarem.\n'
                                    'Wybierz 3 jeżeli chcesz użyć mikstury.\n'))
@@ -64,12 +68,7 @@ def run_game():
             print('-' * 20 + '\n')
 
             if attack == 1:
-                hero.sword_attack()
-                if hero.potion_choice is not None:
-                    hero.potion_choice.use_potion(hero, monster)
-                    hero.hit(monster)
-                else:
-                    hero.hit(monster)
+                hero.attack_with_sword(monster)
             elif attack == 2:
                 print('Twoje czary to:\n')
                 hero.show_skills()
@@ -79,20 +78,19 @@ def run_game():
                     spell = hero.get_spell_class()
                     if not monster.has_immune(spell, hero):
                         spell.additional_effect(monster)
-                        hero.spell_attack(spell)
-                        if hero.potion_choice is not None:
-                            hero.potion_choice.use_potion()
-                            hero.hit(monster)
-                        else:
-                            hero.hit(monster)
+                        hero.attack_with_spell(spell, monster)
                     else:
                         print(f'{monster.name} posiada niewrażliwość na {monster.immune}\n')
             elif attack == 3:
                 hero.show_potions()
                 choose_potion = input('\nWybierz miksturę, którą chcesz użyć: ')
+                if choose_potion == '':
+                    continue
                 print('-' * 20 + '\n')
                 if hero.has_potion(choose_potion):
-                    hero.use_potion(choose_potion)
+                    hero.effects.append(effect_to_make[choose_potion])
+                    hero.use_potion_effect(monster)
+                    del hero.potions[choose_potion]
             if monster.current_health > 0:
                 if monster.frozen > 0:
                     print('Potwór zamrożony, nie odnosisz obrażeń.\n')

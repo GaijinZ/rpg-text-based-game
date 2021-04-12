@@ -112,21 +112,21 @@ class Potion:
 
 
 class HealingPotion(Potion):
-    name = 'healing potion'
+    name = 'hp'
     gold_required = 5
     lvl_required = 1
     action = 'odnawia życie do pełna'
 
 
 class ManaPotion(Potion):
-    name = 'mana potion'
+    name = 'mp'
     gold_required = 5
     lvl_required = 1
     action = 'odnawia manę do pełna'
 
 
 class DoubleDmgPotion(Potion):
-    name = 'double dmg potion'
+    name = 'dd pot'
     gold_required = 12
     lvl_required = 5
     action = 'następny atak zada podwójne obrażenia'
@@ -137,7 +137,7 @@ class DoubleDmgPotion(Potion):
 
 
 class MaxDmgAndIgnoreImmunePotion(Potion):
-    name = 'ignore immune'
+    name = 'ii pot'
     gold_required = 15
     lvl_required = 5
     action = 'usuwa odporność wroga, następny atak zada maksymalne obrażenia'
@@ -166,7 +166,7 @@ weapons_available = [giant_sword, leviathan_axe, war_scythe, blade_of_chaos]
 
 armors_available = [mage_plate, archon_plate, heavy_plate]
 
-potions_available = {'healing_potion': healing_potion,
-                     'mana_potion': mana_potion,
-                     'double_dmg_potion': double_dmg_potion,
-                     'ignore_immune': ignore_immune}
+potions_available = {'hp': healing_potion,
+                     'mp': mana_potion,
+                     'dd pot': double_dmg_potion,
+                     'ii pot': ignore_immune}

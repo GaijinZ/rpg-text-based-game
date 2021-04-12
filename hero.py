@@ -2,6 +2,7 @@ import random
 
 from items import RustedSword
 from shop import items_to_buy
+from effects import effect_to_make
 
 
 class Hero:
@@ -12,14 +13,15 @@ class Hero:
     defence = 0
     base_weapon_dmg = 0
     base_spell_dmg = 0
-    gold = 0
+    gold = 100
     exp = 0
-    lvl = 1
+    lvl = 5
     level_up = 20
 
     dmg_to_make = 0
     get_spell_class = None
-    potion_choice = None
+
+    effects = []
 
     armor = None
     weapon = None
@@ -33,16 +35,23 @@ class Hero:
     def say_hello(self):
         print(f'Jestem {self.name}, przybyłem by zabijać potwory i palić wiedźmy.\n')
 
+    def use_potion_effect(self,monster):
+        if self.effects:
+            for effect in self.effects:
+                return effect.potion_effect(self, monster)
+
     def get_basic_weapon(self):
         self.weapon = RustedSword()
 
-    def sword_attack(self):
+    def attack_with_sword(self, monster):
         if self.mana >= self.max_mana:
             self.mana = self.max_mana
         self.mana += 5
         weapon_dmg = random.randint(self.weapon.min_dmg, self.weapon.max_dmg)
         self.dmg_to_make = weapon_dmg + self.base_weapon_dmg
-        return self.dmg_to_make
+        self.use_potion_effect(monster)
+        monster.current_health -= self.dmg_to_make
+        print(f'Atakujesz wroga za {self.dmg_to_make} punktów życia.\n')
 
     def has_gold_lvl_required(self, buy_item):
         if buy_item.gold_required > self.gold:
@@ -71,7 +80,7 @@ class Hero:
             return self.get_spell_class
         print('Nie masz takiego czaru.\n')
 
-    def spell_attack(self, spell):
+    def attack_with_spell(self, spell, monster):
         if spell.mana > self.mana:
             print('Nie mie masz wystarczającej ilości many.\n')
             return False
@@ -85,30 +94,26 @@ class Hero:
         max_dmg = spell.max_dmg
         spell_dmg = random.randint(min_dmg, max_dmg)
         self.dmg_to_make = spell_dmg + self.base_spell_dmg
-        return self.dmg_to_make
-
-    def hit(self, monster):
+        self.use_potion_effect(monster)
         monster.current_health -= self.dmg_to_make
-        print(f'Atakujesz wroga za {self.dmg_to_make} punktów życia.\n')
+        print(f'Atakujesz wroga za pomocą {spell} za {self.dmg_to_make} punktów życia.\n')
+
+    def check_for_effect(self):
+        if self.effects:
+            for effect in self.effects:
+                effect.turns -= 1
+                if effect.turns == 0:
+                    self.effects.remove(effect)
 
     def add_armor_bonus(self):
         self.max_health += self.armor.health
         self.defence += self.armor.defence
 
     def has_potion(self, choose_potion):
-        return self.potions.get(choose_potion)
-
-    def use_potion(self, choose_potion):
-        if choose_potion == 'healing potion':
-            self.health = self.max_health
-            print('Uzpupełnisaz życie.\n')
-        elif choose_potion == 'mana potion':
-            self.mana = self.max_mana
-            print('Uzpupełnisaz manę.\n')
-        else:
-            get_value = self.potions.get(choose_potion)
-            self.potion_choice = get_value
-        del self.potions[choose_potion]
+        if choose_potion not in self.potions:
+            print('Nie ma takiej mikstury\n')
+            return False
+        return self.potions[choose_potion]
 
     def lvl_up(self):
         if self.exp >= self.level_up:

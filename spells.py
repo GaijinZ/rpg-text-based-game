@@ -54,7 +54,7 @@ class IceBolt(Spell):
     additional_effect_info = f'{name} - Szansa na zamrożenie przećiwnika na jedną turę,'
 
     def additional_effect(self, monster):
-        effect = random.randint(0, 2)
+        effect = random.randint(0, 6)
         if effect == 1:
             monster.frozen += 1
             print(f'\nSkuteczny atak {self.name}, przeciwnik zamarza na jedna turę.')

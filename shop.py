@@ -38,10 +38,10 @@ items_to_buy = {
                'holy light': holy_light,
                'earthquake': earthquake,
                'meteor': meteor},
-    'potions': {'healing potion': healing_potion,
-                'mana potion': mana_potion,
-                'double dmg potion': double_dmg_potion,
-                'ignore immune': ignore_immune},
+    'potions': {'hp': healing_potion,
+                'mp': mana_potion,
+                'dd pot': double_dmg_potion,
+                'ii pot': ignore_immune},
 }
 
 monsters = {
